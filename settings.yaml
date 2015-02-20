@@ -1,0 +1,6 @@
+font-size: 12pt
+margins: 1in
+bibtex: refs.bib
+csl: american-chemical-society-with-titles-no-et-al.csl
+template: draft
+out-format: .pdf
