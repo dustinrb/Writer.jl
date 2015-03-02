@@ -1,14 +1,23 @@
 #! /usr/local/bin/julia
 
-using YAML
+using YAML, AnsiColor
 
 # Because I don't want to be above board right away
 const INSTALL_DIR = homedir() * "/.writer/"
 
+# Creates a project. Creates directory, filt, refs.bib, figures, scripts, tables
+function create_project(project)
+    working_dir = pwd() * "/"
+    print("Creating $project in local directory... ")
+    run(`cp -r $(INSTALL_DIR)init_template $(working_dir)$project`)
+    println(colorize(:green, "done"))
+    exit()
+end
+
 # Get which directory we are working in
 if !isempty(ARGS)
     if ARGS[1] == "init"
-        create_project()
+        create_project(ARGS[2])
     elseif ARGS[1][end] == "/"
         working_dir = ARGS[1]
     else
@@ -16,10 +25,6 @@ if !isempty(ARGS)
     end
 else
     working_dir = pwd() * "/"
-end
-
-# Creates a project. Creates directory, filt, refs.bib, figures, scripts, tables
-function create_project()
 end
 
 # Reads the settings file, and uses defaults it none are specified
@@ -67,7 +72,7 @@ function compile(file)
         --latex-engine=xelatex
         -H $(INSTALL_DIR)templates/$(SETTINGS["template"])/style.tex
         --biblio $working_dir/refs.bib
-        --csl $(INSTALL_DIR)CSLs/$(SETTINGS["csl"])
+        --csl $(INSTALL_DIR)CLSs/$(SETTINGS["csl"])
         -V geometry:margin=$(SETTINGS["margins"])
         -V fontsize:$(SETTINGS["font-size"])
         $file
@@ -77,7 +82,7 @@ function compile(file)
         run(cmd)
     catch e
         println()
-        println("ERROR: Document did not compile!")
+        println(colorize(:red, "ERROR: Document did not compile!"))
         print(e)
     end
 end
@@ -94,7 +99,7 @@ end
 
 print("Loading settings...")
 SETTINGS = get_settings()
-println(" done")
+println(colorize(:green, " done"))
 
 println("Doing initial compiles...")
 for file in readdir()
@@ -103,7 +108,7 @@ for file in readdir()
         println("\t$file")
     end
 end
-println("done")
+println(colorize(:green, "done"))
 
 # For now assume we are compiling all .md files
 watch_file(working_dir) do filename, events, status
@@ -115,20 +120,20 @@ watch_file(working_dir) do filename, events, status
         @async begin
             print("Recompiling $filename...")
             compile(filename)
-            println(" done")
+            println(colorize(:green, " done"))
         end
         # Do stuff to compitle our md
     elseif filename == "settings.yaml" && events.changed
         @async begin
             print("Reloading setttings...")
             SETTINGS = get_settings()
-            println(" done")
+            println(colorize(:green, " done"))
         end
     elseif ismd(filename) && events.renamed && isfile(working_dir * filename)
         @async begin
             print("Compiling $filename...")
             compile(filename)
-            println(" done")
+            println(colorize(:green, " done"))
         end
     end
 end
