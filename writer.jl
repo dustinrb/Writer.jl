@@ -1,6 +1,6 @@
 #! /usr/local/bin/julia
 
-using YAML
+using YAML, AnsiColor
 
 # Because I don't want to be above board right away
 const INSTALL_DIR = homedir() * "/.writer/"
@@ -77,7 +77,7 @@ function compile(file)
         run(cmd)
     catch e
         println()
-        println("ERROR: Document did not compile!")
+        println(red("ERROR: Document did not compile!"))
         print(e)
     end
 end
@@ -94,7 +94,7 @@ end
 
 print("Loading settings...")
 SETTINGS = get_settings()
-println(" done")
+println(green(" done"))
 
 println("Doing initial compiles...")
 for file in readdir()
@@ -103,7 +103,7 @@ for file in readdir()
         println("\t$file")
     end
 end
-println("done")
+println(green("done"))
 
 # For now assume we are compiling all .md files
 watch_file(working_dir) do filename, events, status
@@ -115,20 +115,20 @@ watch_file(working_dir) do filename, events, status
         @async begin
             print("Recompiling $filename...")
             compile(filename)
-            println(" done")
+            println(green(" done"))
         end
         # Do stuff to compitle our md
     elseif filename == "settings.yaml" && events.changed
         @async begin
             print("Reloading setttings...")
             SETTINGS = get_settings()
-            println(" done")
+            println(green(" done"))
         end
     elseif ismd(filename) && events.renamed && isfile(working_dir * filename)
         @async begin
             print("Compiling $filename...")
             compile(filename)
-            println(" done")
+            println(green(" done"))
         end
     end
 end
