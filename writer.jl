@@ -1,6 +1,6 @@
 #! /usr/local/bin/julia
 
-using YAML, AnsiColor
+using YAML, AnsiColor, Lint
 
 # Because I don't want to be above board right away
 const INSTALL_DIR = homedir() * "/.writer/"
@@ -48,12 +48,13 @@ end
 
 # Returns true if file has the .md extension. Keep things simple
 function ismd(filename)
-    # Do some ineligant extension checking
-    if filename[end-2:end] == ".md"
-        return true
-    end
+    # Do some "intelegant" extension checking
+    return filename[end-2:end] == ".md" ? true : false
+end
 
-    return false
+function isjl(filename)
+    # Do some "intelegant" extension checking
+    return filename[end-2:end] == ".jl" ? true : false
 end
 
 function compile(file)
@@ -123,6 +124,8 @@ watch_file(working_dir) do filename, events, status
             println(colorize(:green, " done"))
         end
         # Do stuff to compitle our md
+    # elseif isjl(filename) && events.changed
+    #     @async lintfile(filename)
     elseif filename == "settings.yaml" && events.changed
         @async begin
             print("Reloading setttings...")

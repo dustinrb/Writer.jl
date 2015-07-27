@@ -1,9 +1,5 @@
 \documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$lang$,$endif$$if(papersize)$$papersize$,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$documentclass$}
-$if(fontfamily)$
-\usepackage{$fontfamily$}
-$else$
-\usepackage{lmodern}
-$endif$
+
 $if(linestretch)$
 \usepackage{setspace}
 \setstretch{$linestretch$}
@@ -118,6 +114,18 @@ $endif$
 $if(links-as-notes)$
 % Make links footnotes instead of hotlinks:
 \renewcommand{\href}[2]{#2\footnote{\url{#1}}}
+$endif$
+$if(fontfamily)$
+\usepackage{$fontfamily$}
+$else$
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\usepackage{unicode-math}
+
+\setmainfont{CMU Serif}
+\setsansfont{CMU Sans Serif}
+\setmonofont{CMU Typewriter Text}
+\setmathfont{Latin Modern Math}
 $endif$
 $if(strikeout)$
 \usepackage[normalem]{ulem}
